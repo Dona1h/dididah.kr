@@ -26,17 +26,16 @@
 
   /* ───────── 헤더 ───────── */
   .top{position:fixed;inset:0 0 auto;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:16px 24px;mix-blend-mode:difference;color:#fff}
-  .top .wm{font-weight:800;font-size:15px;letter-spacing:.18em}
+  .top .wm{font-weight:500;font-size:14px;letter-spacing:.2em}
   .top a{color:inherit;text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;border:1px solid currentColor;padding:6px 12px;border-radius:99px}
 
   /* ───────── 히어로 ───────── */
-  .hero{min-height:100svh;background:var(--ink);color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:80px 20px 60px;position:relative}
-  .hero .sym{width:min(74vw,460px);display:block;cursor:pointer}
-  .hero .name{margin-top:44px;font-weight:800;font-size:clamp(34px,7vw,58px);letter-spacing:.16em;text-indent:.16em;line-height:1}
-  .hero .tag{margin-top:18px;font-weight:800;font-size:clamp(11px,2vw,14px);letter-spacing:.32em;text-indent:.32em}
-  .hero .tag .stop{color:var(--signal)}
-  .hero .sub{margin-top:22px;font-weight:300;font-size:clamp(13px,2.4vw,16px);color:var(--cream-60);letter-spacing:.02em;text-align:center;line-height:1.9}
-  .hero .cta{margin-top:36px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .hero{min-height:100svh;background:var(--ink);color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:96px 20px 64px;position:relative}
+  .hero .sym{width:min(42vw,210px);display:block;cursor:pointer}
+  .hero .name{margin-top:38px;font-weight:300;font-size:clamp(34px,7vw,60px);letter-spacing:.2em;text-indent:.2em;line-height:1}
+  .hero .tag{margin-top:20px;font-weight:400;font-size:clamp(11px,2vw,13px);letter-spacing:.34em;text-indent:.34em;text-align:center}
+  .hero .sub{margin-top:24px;font-weight:300;font-size:clamp(13px,2.4vw,16px);color:var(--cream-60);letter-spacing:.02em;text-align:center;line-height:1.9}
+  .hero .cta{margin-top:38px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
   .hero .cta a{text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.14em;padding:13px 26px;border-radius:99px}
   .hero .cta .p{background:var(--signal);color:#fff}
   .hero .cta .s{border:1px solid var(--cream-60);color:var(--cream)}
@@ -60,63 +59,76 @@
   }
 
   /* ───────── 등식 스트립 ───────── */
-  .eqband{background:var(--ink);color:var(--cream);padding:0 20px 90px;display:flex;flex-direction:column;align-items:center;gap:26px}
+  .eqband{background:var(--ink);color:var(--cream);padding:0 20px 96px;display:flex;flex-direction:column;align-items:center;gap:30px}
   .eqband .eq{display:flex;align-items:center;gap:22px}
   .eqband .eq i{display:block;width:16px;height:16px;border-radius:50%;background:var(--cream)}
-  .eqband .eq em{font-style:normal;font-weight:500;font-size:24px}
-  .eqband .eq b{display:block;width:64px;height:14px;border-radius:8px;background:var(--signal)}
+  .eqband .eq em{font-style:normal;font-weight:400;font-size:24px}
+  .eqband .eq b{display:block;width:70px;height:16px;border-radius:8px;background:var(--signal)}
   .eqband p{font-weight:300;font-size:14.5px;color:var(--cream-60);text-align:center;line-height:2;max-width:520px}
-  .eqband p b{font-weight:700;color:var(--cream)}
+  .eqband p b{font-weight:500;color:var(--cream)}
 
   /* ───────── 섹션 공통 ───────── */
-  section.block{max-width:1040px;margin:0 auto;padding:96px 24px}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--signal-text);margin-bottom:18px}
-  h2.title{font-weight:800;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em;line-height:1.35}
+  section.block{max-width:1040px;margin:0 auto;padding:112px 24px}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--signal-text);margin-bottom:20px}
+  h2.title{font-weight:500;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em;line-height:1.4}
   .lead{margin-top:16px;font-weight:300;font-size:15.5px;line-height:2;color:#555}
 
-  /* 3단계 카드 */
-  .steps{margin-top:52px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-  .step{background:#fff;border:1px solid #e4e0d5;border-radius:16px;padding:30px 26px}
-  .step .no{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--signal-text)}
-  .step h3{margin-top:14px;font-weight:800;font-size:18px;line-height:1.5}
-  .step p{margin-top:12px;font-weight:300;font-size:13.5px;line-height:1.95;color:#555}
-  .step .morse{margin-top:22px;display:flex;gap:7px;align-items:center}
-  .step .morse i{display:block;width:9px;height:9px;border-radius:50%;background:var(--ink)}
-  .step .morse b{display:block;height:9px;border-radius:5px;background:var(--signal)}
+  /* How it works — 에디토리얼 3스텝 */
+  .flow{margin-top:60px;display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .fstep{padding:6px 30px;border-left:1px solid #ddd8ca}
+  .fstep:first-child{padding-left:0;border-left:none}
+  .fnum{font-family:var(--mono);font-size:34px;font-weight:400;color:#d8d2c4;letter-spacing:.02em}
+  .fstep h3{margin-top:22px;font-weight:500;font-size:18px;line-height:1.55}
+  .fstep p{margin-top:14px;font-weight:300;font-size:13.5px;line-height:1.95;color:#666}
 
-  /* 양면 */
-  .duo{margin-top:52px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
-  .duo .card{border-radius:16px;padding:34px 30px;min-height:230px;display:flex;flex-direction:column;justify-content:space-between}
-  .duo .op{background:var(--ink);color:var(--cream)}
+  /* Two sides — 클릭 시 목업 열림 */
+  .duo{margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .duo .card{display:block;width:100%;text-align:left;font-family:inherit;cursor:pointer;border-radius:18px;padding:38px 34px;min-height:240px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .2s ease, box-shadow .2s ease}
+  .duo .card:hover{transform:translateY(-5px)}
+  .duo .op{background:var(--ink);color:var(--cream);border:none}
+  .duo .op:hover{box-shadow:0 18px 40px rgba(0,0,0,.28)}
   .duo .me{background:#fff;border:1px solid #e4e0d5}
+  .duo .me:hover{box-shadow:0 18px 40px rgba(0,0,0,.10)}
   .duo .who{font-family:var(--mono);font-size:11px;letter-spacing:.24em}
   .duo .op .who{color:var(--cream-60)}
   .duo .me .who{color:var(--signal-text)}
-  .duo h3{margin-top:14px;font-weight:800;font-size:20px;line-height:1.5}
+  .duo h3{margin-top:14px;font-weight:500;font-size:21px;line-height:1.5}
   .duo p{margin-top:12px;font-weight:300;font-size:13.5px;line-height:1.95}
   .duo .op p{color:var(--cream-60)}
-  .duo .me p{color:#555}
+  .duo .me p{color:#666}
+  .duo .peek{margin-top:26px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;display:inline-flex;align-items:center;gap:8px}
+  .duo .op .peek{color:var(--cream)}
+  .duo .me .peek{color:var(--signal-text)}
+  .duo .peek .ar{transition:transform .2s ease}
+  .duo .card:hover .peek .ar{transform:translateX(4px)}
 
-  /* CONNECTED 밴드 */
-  .connected{background:var(--ink);color:var(--cream);padding:110px 24px;display:flex;flex-direction:column;align-items:center;gap:34px}
-  .connected .strip{display:flex;gap:9px;align-items:center;flex-wrap:wrap;justify-content:center}
-  .connected .strip i{display:block;width:11px;height:11px;border-radius:50%;background:var(--cream)}
-  .connected .strip b{display:block;height:11px;border-radius:6px;background:var(--signal)}
-  .connected .strip .gap{width:14px}
-  .connected .line{font-weight:800;font-size:clamp(16px,3.4vw,24px);letter-spacing:.28em;text-indent:.28em}
-  .connected .cap{font-weight:300;font-size:13px;color:var(--cream-60);letter-spacing:.04em}
+  /* ───────── CONNECTED ───────── */
+  .connected{background:var(--ink);color:var(--cream);padding:120px 24px;display:flex;flex-direction:column;align-items:center;gap:22px}
+  .connected .line{font-weight:500;font-size:clamp(16px,3.4vw,24px);letter-spacing:.28em;text-indent:.28em;text-align:center}
+  .connected .cap{font-weight:300;font-size:13px;color:var(--cream-60);letter-spacing:.04em;text-align:center}
 
   /* 푸터 */
   footer{background:var(--ink);color:var(--cream-60);padding:0 24px 54px}
-  footer .inner{max-width:1040px;margin:0 auto;border-top:1px solid #333;padding-top:36px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-  footer .cemark{width:30px;height:30px;border-radius:50%;border:1.4px solid var(--signal);display:flex;align-items:center;justify-content:center}
-  footer .cemark svg{width:17px;display:block}
-  footer .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;line-height:2}
+  footer .inner{max-width:1040px;margin:0 auto;border-top:1px solid #333;padding-top:34px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  footer .fwm{font-weight:500;font-size:13px;letter-spacing:.2em;color:var(--cream)}
+  footer .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;line-height:2;text-align:right}
+
+  /* ───────── 목업 모달 ───────── */
+  .modal{position:fixed;inset:0;z-index:100;background:rgba(10,10,10,.72);backdrop-filter:blur(3px);display:none;flex-direction:column;padding:20px}
+  .modal.open{display:flex}
+  .modal-bar{display:flex;justify-content:space-between;align-items:center;max-width:1040px;width:100%;margin:0 auto 12px;color:#fff}
+  .modal-bar .mt{font-family:var(--mono);font-size:12px;letter-spacing:.14em}
+  .modal-bar button{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:8px 16px;cursor:pointer}
+  .modal-frame-wrap{flex:1;max-width:1040px;width:100%;margin:0 auto;border-radius:16px;overflow:hidden;background:#fff}
+  .modal iframe{width:100%;height:100%;border:0;display:block}
 
   @media (max-width:760px){
-    .steps{grid-template-columns:1fr}
+    .hero .sym{width:min(52vw,180px)}
+    .flow{grid-template-columns:1fr;gap:0}
+    .fstep{padding:26px 0;border-left:none;border-top:1px solid #ddd8ca}
+    .fstep:first-child{border-top:none;padding-top:0}
     .duo{grid-template-columns:1fr}
-    section.block{padding:72px 20px}
+    section.block{padding:80px 20px}
   }
 </style>
 </head>
@@ -127,10 +139,10 @@
   <a href="mailto:hello@dididah.kr">도입 문의</a>
 </header>
 
-<!-- ───────── 히어로: 심벌 드로잉 모션 ───────── -->
+<!-- ───────── 히어로 ───────── -->
 <section class="hero">
   <svg id="sym" class="sym" viewBox="0 0 340 220" fill="none" role="img" aria-label="디디다 심벌 — 여섯 개의 점이 중심에서 방사선으로 연결됩니다">
-    <g stroke="#f0532f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <g stroke="#f0532f" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
       <path class="ray" pathLength="1" d="M166,115 L10,118"/>
       <path class="ray" pathLength="1" d="M166,115 L330,106"/>
       <path class="ray" pathLength="1" d="M169,106 L156,14"/>
@@ -139,16 +151,16 @@
       <path class="ray" pathLength="1" d="M176,112 L262,34"/>
     </g>
     <g fill="#fffaee">
-      <circle class="dot d1" cx="10" cy="118" r="5"/>
-      <circle class="dot d2" cx="156" cy="14" r="5"/>
-      <circle class="dot d3" cx="330" cy="106" r="5"/>
-      <circle class="dot d4" cx="176" cy="206" r="5"/>
-      <circle class="dot d5" cx="86" cy="186" r="5"/>
-      <circle class="dot d6" cx="262" cy="34" r="5"/>
+      <circle class="dot d1" cx="10" cy="118" r="6"/>
+      <circle class="dot d2" cx="156" cy="14" r="6"/>
+      <circle class="dot d3" cx="330" cy="106" r="6"/>
+      <circle class="dot d4" cx="176" cy="206" r="6"/>
+      <circle class="dot d5" cx="86" cy="186" r="6"/>
+      <circle class="dot d6" cx="262" cy="34" r="6"/>
     </g>
   </svg>
   <h1 class="name">DIDIDAH</h1>
-  <p class="tag">EVERY TRY CONNECTS <span class="stop">·· ―</span></p>
+  <p class="tag">EVERY TRY CONNECTS</p>
   <p class="sub">출석이 기록이 되고, 기록이 연결이 되는<br>피트니스 멤버십 도구 — 디디다</p>
   <div class="cta">
     <a class="p" href="mailto:hello@dididah.kr">도입 문의하기</a>
@@ -173,24 +185,21 @@
 <section class="block">
   <p class="kicker">HOW IT WORKS</p>
   <h2 class="title">태그 한 번에서 시작해,<br>빈자리 매출까지 이어집니다</h2>
-  <div class="steps">
-    <div class="step">
-      <p class="no">STEP 01 · 디</p>
+  <div class="flow">
+    <div class="fstep">
+      <span class="fnum">01</span>
       <h3>태그 한 번으로<br>출석이 기록됩니다</h3>
-      <p>회원은 입장할 때 태그 한 번. 그걸로 끝입니다. 출석은 자동으로 점이 되어 회원의 기록에 찍힙니다.</p>
-      <div class="morse"><i></i></div>
+      <p>입장할 때 태그 한 번. 출석은 자동으로 점이 되어 회원의 기록에 남습니다.</p>
     </div>
-    <div class="step">
-      <p class="no">STEP 02 · 디</p>
+    <div class="fstep">
+      <span class="fnum">02</span>
       <h3>출석률이 보이면<br>빈자리가 상품이 됩니다</h3>
-      <p>시간대별 출석률이 한눈에 보이고, 비는 레인은 일일권·보강권으로 바로 판매 페이지에 올릴 수 있습니다.</p>
-      <div class="morse"><i></i><i></i></div>
+      <p>시간대별 출석률이 한눈에. 비는 자리는 일일권·보강권으로 바로 판매합니다.</p>
     </div>
-    <div class="step">
-      <p class="no">STEP 03 · 다</p>
+    <div class="fstep">
+      <span class="fnum">03</span>
       <h3>쌓인 기록이<br>재등록을 만듭니다</h3>
-      <p>회원은 자기 성장 기록을 눈으로 확인하고, 운영자는 만료 임박 회원을 놓치지 않습니다. 기록이 다음 등록으로 이어집니다.</p>
-      <div class="morse"><i></i><i></i><b style="width:40px"></b></div>
+      <p>회원은 자기 성장을 확인하고, 운영자는 만료 임박 회원을 놓치지 않습니다.</p>
     </div>
   </div>
 </section>
@@ -200,30 +209,27 @@
   <p class="kicker">TWO SIDES, ONE RECORD</p>
   <h2 class="title">운영자와 회원이<br>같은 기록을 다른 화면으로 봅니다</h2>
   <div class="duo">
-    <div class="card op">
+    <button class="card op" type="button" data-demo="demo/operator.html" data-title="디디다 매니저 · 운영자 데모">
       <div>
         <p class="who">FOR OPERATORS</p>
         <h3>디디다 매니저</h3>
         <p>출석률 히트맵 · 빈자리 상품 기획 · 재등록 레이더.<br>"디딘 만큼 보이고, 빈 만큼 팝니다."</p>
       </div>
-    </div>
-    <div class="card me">
+      <span class="peek">데모 열기 <span class="ar">→</span></span>
+    </button>
+    <button class="card me" type="button" data-demo="demo/member.html" data-title="디디다 회원 앱 · 회원 데모">
       <div>
         <p class="who">FOR MEMBERS</p>
         <h3>디디다 회원 앱</h3>
         <p>전자 회원증 · 이번 달 디딘 날들 · 나의 운동 히스토리.<br>"오늘도 디뎠다."</p>
       </div>
-    </div>
+      <span class="peek">데모 열기 <span class="ar">→</span></span>
+    </button>
   </div>
 </section>
 
 <!-- ───────── CONNECTED ───────── -->
 <div class="connected">
-  <div class="strip" aria-hidden="true">
-    <i></i><i></i><b style="width:34px"></b><span class="gap"></span>
-    <i></i><b style="width:26px"></b><i></i><span class="gap"></span>
-    <i></i><i></i><b style="width:46px"></b>
-  </div>
   <p class="line">EVERY TRY, CONNECTED.</p>
   <p class="cap">지나간 시도는 사라지지 않습니다. 전부 이어져 있습니다.</p>
 </div>
@@ -231,20 +237,30 @@
 <!-- ───────── 푸터 ───────── -->
 <footer>
   <div class="inner">
-    <span class="cemark">
-      <svg viewBox="0 0 171 20"><g fill="#f0532f"><circle cx="10" cy="10" r="10"/><circle cx="52" cy="10" r="10"/><rect x="84" width="87" height="20" rx="10"/></g></svg>
-    </span>
+    <span class="fwm">DIDIDAH</span>
     <p class="meta">DIDIDAH.KR · SEOUL<br>&copy;2026 DIDIDAH. EVERY TRY CONNECTS.</p>
   </div>
 </footer>
 
+<!-- ───────── 목업 모달 ───────── -->
+<div class="modal" id="demoModal" role="dialog" aria-modal="true" aria-label="목업 데모">
+  <div class="modal-bar">
+    <span class="mt" id="demoTitle"></span>
+    <button type="button" id="demoClose">닫기 ✕</button>
+  </div>
+  <div class="modal-frame-wrap">
+    <iframe id="demoFrame" title="목업 데모" loading="lazy"></iframe>
+  </div>
+</div>
+
 <script>
 (function(){
+  /* 심벌 드로잉 모션 */
   var sym=document.getElementById('sym');
-  var UNIT=0.12; // 사운드 유닛(초) — 디1:디1:다3
+  var UNIT=0.12;
   function replay(withSound){
     sym.classList.remove('playing');
-    void sym.getBoundingClientRect(); // reflow로 애니메이션 리셋
+    void sym.getBoundingClientRect();
     sym.classList.add('playing');
     if(withSound) beep();
   }
@@ -266,6 +282,24 @@
   }
   sym.addEventListener('click',function(){replay(true)});
   window.addEventListener('load',function(){setTimeout(function(){replay(false)},300)});
+
+  /* 목업 모달 */
+  var modal=document.getElementById('demoModal');
+  var frame=document.getElementById('demoFrame');
+  var mtitle=document.getElementById('demoTitle');
+  function openDemo(src,title){
+    frame.src=src;mtitle.textContent=title;
+    modal.classList.add('open');document.body.style.overflow='hidden';
+  }
+  function closeDemo(){
+    modal.classList.remove('open');frame.src='about:blank';document.body.style.overflow='';
+  }
+  document.querySelectorAll('[data-demo]').forEach(function(el){
+    el.addEventListener('click',function(){openDemo(el.getAttribute('data-demo'),el.getAttribute('data-title'))});
+  });
+  document.getElementById('demoClose').addEventListener('click',closeDemo);
+  modal.addEventListener('click',function(e){if(e.target===modal)closeDemo()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal.classList.contains('open'))closeDemo()});
 })();
 </script>
 </body>
