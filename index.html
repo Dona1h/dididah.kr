@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디디다 DIDIDAH — 점이 두 개 찍히면, 이어진다</title>
+<meta name="description" content="출석이 기록이 되고, 기록이 연결이 되는 피트니스 멤버십 도구. EVERY TRY CONNECTS.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=42dot+Sans:wght@300;400;500;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 171 20"><g fill="%23f0532f"><circle cx="10" cy="10" r="10"/><circle cx="52" cy="10" r="10"/><rect x="84" width="87" height="20" rx="10"/></g></svg>'>
+<style>
+  :root{
+    --ink:#191919;
+    --cream:#fffaee;
+    --cream-60:#b9b5aa;
+    --paper:#f4f1e8;
+    --signal:#f0532f;
+    --signal-text:#b5310f;
+    --dot42:"42dot Sans",sans-serif;
+    --mono:"IBM Plex Mono",monospace;
+    --u:240ms;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--dot42);color:var(--ink);background:var(--paper)}
+
+  /* ───────── 헤더 ───────── */
+  .top{position:fixed;inset:0 0 auto;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:16px 24px;mix-blend-mode:difference;color:#fff}
+  .top .wm{font-weight:800;font-size:15px;letter-spacing:.18em}
+  .top a{color:inherit;text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;border:1px solid currentColor;padding:6px 12px;border-radius:99px}
+
+  /* ───────── 히어로 ───────── */
+  .hero{min-height:100svh;background:var(--ink);color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:80px 20px 60px;position:relative}
+  .hero .sym{width:min(74vw,460px);display:block;cursor:pointer}
+  .hero .name{margin-top:44px;font-weight:800;font-size:clamp(34px,7vw,58px);letter-spacing:.16em;text-indent:.16em;line-height:1}
+  .hero .tag{margin-top:18px;font-weight:800;font-size:clamp(11px,2vw,14px);letter-spacing:.32em;text-indent:.32em}
+  .hero .tag .stop{color:var(--signal)}
+  .hero .sub{margin-top:22px;font-weight:300;font-size:clamp(13px,2.4vw,16px);color:var(--cream-60);letter-spacing:.02em;text-align:center;line-height:1.9}
+  .hero .cta{margin-top:36px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .hero .cta a{text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.14em;padding:13px 26px;border-radius:99px}
+  .hero .cta .p{background:var(--signal);color:#fff}
+  .hero .cta .s{border:1px solid var(--cream-60);color:var(--cream)}
+  .hero .hint{position:absolute;bottom:18px;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:#666}
+
+  /* 드로잉 모션 */
+  .sym .dot{transform-origin:center;transform-box:fill-box}
+  .playing .dot{opacity:0;animation:pop .32s cubic-bezier(.34,1.56,.64,1) forwards}
+  @keyframes pop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+  .playing .d1{animation-delay:0ms}
+  .playing .d2{animation-delay:var(--u)}
+  .playing .d3{animation-delay:calc(var(--u)*1.28)}
+  .playing .d4{animation-delay:calc(var(--u)*1.52)}
+  .playing .d5{animation-delay:calc(var(--u)*1.76)}
+  .playing .d6{animation-delay:calc(var(--u)*2)}
+  .sym .ray{stroke-dasharray:1;stroke-dashoffset:0}
+  .playing .ray{stroke-dashoffset:1;animation:draw calc(var(--u)*3) cubic-bezier(.22,1,.36,1) forwards;animation-delay:calc(var(--u)*2.3)}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @media (prefers-reduced-motion: reduce){
+    .playing .dot,.playing .ray{animation:none;opacity:1;stroke-dashoffset:0}
+  }
+
+  /* ───────── 등식 스트립 ───────── */
+  .eqband{background:var(--ink);color:var(--cream);padding:0 20px 90px;display:flex;flex-direction:column;align-items:center;gap:26px}
+  .eqband .eq{display:flex;align-items:center;gap:22px}
+  .eqband .eq i{display:block;width:16px;height:16px;border-radius:50%;background:var(--cream)}
+  .eqband .eq em{font-style:normal;font-weight:500;font-size:24px}
+  .eqband .eq b{display:block;width:64px;height:14px;border-radius:8px;background:var(--signal)}
+  .eqband p{font-weight:300;font-size:14.5px;color:var(--cream-60);text-align:center;line-height:2;max-width:520px}
+  .eqband p b{font-weight:700;color:var(--cream)}
+
+  /* ───────── 섹션 공통 ───────── */
+  section.block{max-width:1040px;margin:0 auto;padding:96px 24px}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.26em;color:var(--signal-text);margin-bottom:18px}
+  h2.title{font-weight:800;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em;line-height:1.35}
+  .lead{margin-top:16px;font-weight:300;font-size:15.5px;line-height:2;color:#555}
+
+  /* 3단계 카드 */
+  .steps{margin-top:52px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .step{background:#fff;border:1px solid #e4e0d5;border-radius:16px;padding:30px 26px}
+  .step .no{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--signal-text)}
+  .step h3{margin-top:14px;font-weight:800;font-size:18px;line-height:1.5}
+  .step p{margin-top:12px;font-weight:300;font-size:13.5px;line-height:1.95;color:#555}
+  .step .morse{margin-top:22px;display:flex;gap:7px;align-items:center}
+  .step .morse i{display:block;width:9px;height:9px;border-radius:50%;background:var(--ink)}
+  .step .morse b{display:block;height:9px;border-radius:5px;background:var(--signal)}
+
+  /* 양면 */
+  .duo{margin-top:52px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .duo .card{border-radius:16px;padding:34px 30px;min-height:230px;display:flex;flex-direction:column;justify-content:space-between}
+  .duo .op{background:var(--ink);color:var(--cream)}
+  .duo .me{background:#fff;border:1px solid #e4e0d5}
+  .duo .who{font-family:var(--mono);font-size:11px;letter-spacing:.24em}
+  .duo .op .who{color:var(--cream-60)}
+  .duo .me .who{color:var(--signal-text)}
+  .duo h3{margin-top:14px;font-weight:800;font-size:20px;line-height:1.5}
+  .duo p{margin-top:12px;font-weight:300;font-size:13.5px;line-height:1.95}
+  .duo .op p{color:var(--cream-60)}
+  .duo .me p{color:#555}
+
+  /* CONNECTED 밴드 */
+  .connected{background:var(--ink);color:var(--cream);padding:110px 24px;display:flex;flex-direction:column;align-items:center;gap:34px}
+  .connected .strip{display:flex;gap:9px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .connected .strip i{display:block;width:11px;height:11px;border-radius:50%;background:var(--cream)}
+  .connected .strip b{display:block;height:11px;border-radius:6px;background:var(--signal)}
+  .connected .strip .gap{width:14px}
+  .connected .line{font-weight:800;font-size:clamp(16px,3.4vw,24px);letter-spacing:.28em;text-indent:.28em}
+  .connected .cap{font-weight:300;font-size:13px;color:var(--cream-60);letter-spacing:.04em}
+
+  /* 푸터 */
+  footer{background:var(--ink);color:var(--cream-60);padding:0 24px 54px}
+  footer .inner{max-width:1040px;margin:0 auto;border-top:1px solid #333;padding-top:36px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  footer .cemark{width:30px;height:30px;border-radius:50%;border:1.4px solid var(--signal);display:flex;align-items:center;justify-content:center}
+  footer .cemark svg{width:17px;display:block}
+  footer .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;line-height:2}
+
+  @media (max-width:760px){
+    .steps{grid-template-columns:1fr}
+    .duo{grid-template-columns:1fr}
+    section.block{padding:72px 20px}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <span class="wm">DIDIDAH</span>
+  <a href="mailto:hello@dididah.kr">도입 문의</a>
+</header>
+
+<!-- ───────── 히어로: 심벌 드로잉 모션 ───────── -->
+<section class="hero">
+  <svg id="sym" class="sym" viewBox="0 0 340 220" fill="none" role="img" aria-label="디디다 심벌 — 여섯 개의 점이 중심에서 방사선으로 연결됩니다">
+    <g stroke="#f0532f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+      <path class="ray" pathLength="1" d="M166,115 L10,118"/>
+      <path class="ray" pathLength="1" d="M166,115 L330,106"/>
+      <path class="ray" pathLength="1" d="M169,106 L156,14"/>
+      <path class="ray" pathLength="1" d="M169,106 L176,206"/>
+      <path class="ray" pathLength="1" d="M176,112 L86,186"/>
+      <path class="ray" pathLength="1" d="M176,112 L262,34"/>
+    </g>
+    <g fill="#fffaee">
+      <circle class="dot d1" cx="10" cy="118" r="5"/>
+      <circle class="dot d2" cx="156" cy="14" r="5"/>
+      <circle class="dot d3" cx="330" cy="106" r="5"/>
+      <circle class="dot d4" cx="176" cy="206" r="5"/>
+      <circle class="dot d5" cx="86" cy="186" r="5"/>
+      <circle class="dot d6" cx="262" cy="34" r="5"/>
+    </g>
+  </svg>
+  <h1 class="name">DIDIDAH</h1>
+  <p class="tag">EVERY TRY CONNECTS <span class="stop">·· ―</span></p>
+  <p class="sub">출석이 기록이 되고, 기록이 연결이 되는<br>피트니스 멤버십 도구 — 디디다</p>
+  <div class="cta">
+    <a class="p" href="mailto:hello@dididah.kr">도입 문의하기</a>
+    <a class="s" href="#concept">디디다 알아보기</a>
+  </div>
+  <p class="hint">심벌을 누르면 디·디·다 리듬으로 다시 그려집니다</p>
+</section>
+
+<!-- ───────── 등식 ───────── -->
+<div class="eqband" id="concept">
+  <div class="eq" aria-label="점 점 은 선과 같다">
+    <i></i><i></i><em>=</em><b></b>
+  </div>
+  <p><b>"점이 두 개 찍히면, 이어진다."</b><br>
+  오늘 한 번의 방문이 점 하나. 다음 방문이 점 하나 더.<br>
+  두 점은 선이 되고, 선은 흐름이 됩니다.<br>
+  오늘의 점과 일주일 뒤의 점도, 수영의 점과 필라테스의 점도 —<br>
+  디디다 안에서는 모든 시도가 서로 이어질 수 있습니다.</p>
+</div>
+
+<!-- ───────── 서비스 3단계 ───────── -->
+<section class="block">
+  <p class="kicker">HOW IT WORKS</p>
+  <h2 class="title">태그 한 번에서 시작해,<br>빈자리 매출까지 이어집니다</h2>
+  <div class="steps">
+    <div class="step">
+      <p class="no">STEP 01 · 디</p>
+      <h3>태그 한 번으로<br>출석이 기록됩니다</h3>
+      <p>회원은 입장할 때 태그 한 번. 그걸로 끝입니다. 출석은 자동으로 점이 되어 회원의 기록에 찍힙니다.</p>
+      <div class="morse"><i></i></div>
+    </div>
+    <div class="step">
+      <p class="no">STEP 02 · 디</p>
+      <h3>출석률이 보이면<br>빈자리가 상품이 됩니다</h3>
+      <p>시간대별 출석률이 한눈에 보이고, 비는 레인은 일일권·보강권으로 바로 판매 페이지에 올릴 수 있습니다.</p>
+      <div class="morse"><i></i><i></i></div>
+    </div>
+    <div class="step">
+      <p class="no">STEP 03 · 다</p>
+      <h3>쌓인 기록이<br>재등록을 만듭니다</h3>
+      <p>회원은 자기 성장 기록을 눈으로 확인하고, 운영자는 만료 임박 회원을 놓치지 않습니다. 기록이 다음 등록으로 이어집니다.</p>
+      <div class="morse"><i></i><i></i><b style="width:40px"></b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── 양면 ───────── -->
+<section class="block" style="padding-top:0">
+  <p class="kicker">TWO SIDES, ONE RECORD</p>
+  <h2 class="title">운영자와 회원이<br>같은 기록을 다른 화면으로 봅니다</h2>
+  <div class="duo">
+    <div class="card op">
+      <div>
+        <p class="who">FOR OPERATORS</p>
+        <h3>디디다 매니저</h3>
+        <p>출석률 히트맵 · 빈자리 상품 기획 · 재등록 레이더.<br>"디딘 만큼 보이고, 빈 만큼 팝니다."</p>
+      </div>
+    </div>
+    <div class="card me">
+      <div>
+        <p class="who">FOR MEMBERS</p>
+        <h3>디디다 회원 앱</h3>
+        <p>전자 회원증 · 이번 달 디딘 날들 · 나의 운동 히스토리.<br>"오늘도 디뎠다."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── CONNECTED ───────── -->
+<div class="connected">
+  <div class="strip" aria-hidden="true">
+    <i></i><i></i><b style="width:34px"></b><span class="gap"></span>
+    <i></i><b style="width:26px"></b><i></i><span class="gap"></span>
+    <i></i><i></i><b style="width:46px"></b>
+  </div>
+  <p class="line">EVERY TRY, CONNECTED.</p>
+  <p class="cap">지나간 시도는 사라지지 않습니다. 전부 이어져 있습니다.</p>
+</div>
+
+<!-- ───────── 푸터 ───────── -->
+<footer>
+  <div class="inner">
+    <span class="cemark">
+      <svg viewBox="0 0 171 20"><g fill="#f0532f"><circle cx="10" cy="10" r="10"/><circle cx="52" cy="10" r="10"/><rect x="84" width="87" height="20" rx="10"/></g></svg>
+    </span>
+    <p class="meta">DIDIDAH.KR · SEOUL<br>&copy;2026 DIDIDAH. EVERY TRY CONNECTS.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var sym=document.getElementById('sym');
+  var UNIT=0.12; // 사운드 유닛(초) — 디1:디1:다3
+  function replay(withSound){
+    sym.classList.remove('playing');
+    void sym.getBoundingClientRect(); // reflow로 애니메이션 리셋
+    sym.classList.add('playing');
+    if(withSound) beep();
+  }
+  function beep(){
+    try{
+      var ctx=beep.ctx||(beep.ctx=new (window.AudioContext||window.webkitAudioContext)());
+      var t=ctx.currentTime+0.02;
+      [[t,UNIT,660],[t+UNIT*1.5,UNIT,660],[t+UNIT*3,UNIT*3,440]].forEach(function(n){
+        var o=ctx.createOscillator(),g=ctx.createGain();
+        o.type='sine';o.frequency.value=n[2];
+        g.gain.setValueAtTime(0.0001,n[0]);
+        g.gain.linearRampToValueAtTime(0.18,n[0]+0.015);
+        g.gain.setValueAtTime(0.18,n[0]+n[1]-0.03);
+        g.gain.linearRampToValueAtTime(0.0001,n[0]+n[1]);
+        o.connect(g).connect(ctx.destination);
+        o.start(n[0]);o.stop(n[0]+n[1]+0.02);
+      });
+    }catch(e){}
+  }
+  sym.addEventListener('click',function(){replay(true)});
+  window.addEventListener('load',function(){setTimeout(function(){replay(false)},300)});
+})();
+</script>
+</body>
+</html>
