@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>디디다(DiDiDAH) 운영자 대시보드</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* ============================================================
+   공통 브랜드 토큰 (정본 — Task 1에서 그대로 복사)
+   ============================================================ */
+:root{
+  --ink:#1a2233;--sub:#5c6577;--soft:#98a1b3;--line:#e6e9ef;--bg:#f7f8fa;--white:#fff;
+  --signal:#f0532f;      /* 신호 주홍(인주) — 점·관통획·모션 전용. "점을 찍는" 도장 인주의 색 */
+  --signal-bg:#fdeee9;--signal-text:#b5310f;  /* 본문용 AA 대비 */
+  --ok:#0f8a6d;--ok-bg:#e7f6f1;--warn:#a96f13;--warn-bg:#fdf3d9;
+  --danger:#c21f3a;--danger-bg:#fbe9ed;      /* 진홍 — 주홍과 색상·용도 분리, 아이콘+텍스트 병용 */
+  --navy:#1f2a3d;
+  --u:14px;              /* 모스 단위 u: 점 지름 1u · 선 길이 3u · 간격 1u */
+  --r-lg:20px;--r-md:14px;--r-sm:10px;
+  --shadow:0 1px 2px rgba(20,28,45,.05),0 8px 24px rgba(20,28,45,.06);
+}
+body{font-family:"Pretendard Variable",Pretendard,-apple-system,"Noto Sans KR",sans-serif;
+  color:var(--ink);letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+.num{font-variant-numeric:tabular-nums}
+
+/* ============================================================
+   모스 스트립 렌더러 스타일 (정본 — Task 1에서 그대로 복사)
+   ============================================================ */
+.strip-week{display:flex;align-items:center;gap:calc(var(--u)/2);margin:6px 0}
+.seg.dot{width:var(--u);height:var(--u);border-radius:50%}
+.seg.dot.on{background:var(--signal)}
+.seg.dot.off{background:var(--line)}
+.seg.link{width:calc(var(--u)/2 + var(--u));height:var(--u);border-radius:calc(var(--u)/2);
+  background:var(--signal);margin:0 calc(-1 * var(--u))}  /* 이웃 점과 겹쳐 한 선으로 보임 */
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms !important}}
+
+/* ============================================================
+   이하 운영자 대시보드 전용 스타일
+   ============================================================ */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);padding:40px 20px 96px}
+.page{max-width:1080px;margin:0 auto}
+
+/* ① 헤더 */
+.dash-header{display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:6px 4px 26px;flex-wrap:wrap}
+.dash-header-left{display:flex;align-items:center;gap:16px}
+.dash-header-left svg{width:44px;height:auto;flex:none}
+.dash-title{font-size:19px;font-weight:800;margin:0;color:var(--ink)}
+.dash-tagline{margin:4px 0 0;font-size:13.5px;color:var(--sub)}
+.dash-date{font-size:12.5px;color:var(--soft);text-align:right}
+
+/* 카드 공통 */
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);padding:26px 28px;margin-bottom:20px}
+.card-title{font-size:14px;font-weight:700;color:var(--ink);margin:0 0 4px}
+.card-sub{font-size:12px;color:var(--soft);margin:0 0 18px}
+
+/* ② 오늘 요약 스탯 */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--white);border:1px solid var(--line);border-radius:var(--r-md);
+  box-shadow:var(--shadow);padding:18px 20px}
+.stat-label{font-size:12px;color:var(--sub);margin:0 0 10px;font-weight:600}
+.stat-value{font-size:26px;font-weight:800;color:var(--ink);margin:0;line-height:1.15}
+.stat-value .unit{font-size:13px;font-weight:600;color:var(--sub);margin-left:2px}
+.stat-value.accent{color:var(--signal-text)}
+.stat-foot{margin:8px 0 0;font-size:11.5px;color:var(--soft)}
+.assume-badge{display:inline-block;font-size:10.5px;font-weight:700;color:var(--warn);
+  background:var(--warn-bg);border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:1px}
+
+/* ③ 히트맵 */
+.heatmap-scroll{overflow-x:auto}
+table.heatmap{border-collapse:collapse;width:100%;min-width:560px}
+table.heatmap th,table.heatmap td{padding:0;text-align:center}
+table.heatmap th{font-size:12px;color:var(--sub);font-weight:600;padding:0 0 8px}
+table.heatmap td.time-cell{font-size:12.5px;color:var(--sub);font-weight:700;text-align:left;
+  padding-right:14px;white-space:nowrap}
+.cell{position:relative;border-radius:8px;height:46px;width:100%;min-width:70px;
+  display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;
+  cursor:pointer;border:1px solid rgba(20,28,45,.04);margin:3px 0}
+.cell:hover{outline:2px solid var(--ink);outline-offset:1px}
+.cell.selected{outline:2px solid var(--ink);outline-offset:1px}
+.cell .badge-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;
+  background:var(--signal)}
+.heatmap-legend{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:11.5px;color:var(--soft)}
+.legend-scale{display:flex;gap:3px}
+.legend-scale span{width:16px;height:10px;border-radius:2px}
+.legend-dot{width:8px;height:8px;border-radius:50%;background:var(--signal);display:inline-block;margin-left:14px}
+
+/* ④⑤ 2열 레이아웃 */
+.two-col{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
+@media(max-width:760px){.two-col{grid-template-columns:1fr}}
+
+/* 빈자리 상품 패널 */
+table.product-table{width:100%;border-collapse:collapse;font-size:13px}
+table.product-table th{text-align:left;color:var(--sub);font-weight:600;font-size:11.5px;
+  padding:0 8px 8px;border-bottom:1px solid var(--line)}
+table.product-table td{padding:11px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.product-table tr.active td{background:var(--bg)}
+.price-row-badge{display:inline-block;font-size:10px;font-weight:700;color:var(--warn);
+  background:var(--warn-bg);border-radius:999px;padding:1px 7px;margin-left:6px}
+.sellable-count{font-weight:800;color:var(--ink)}
+.sellable-count.has{color:var(--signal-text)}
+.sell-btn{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:var(--white);
+  border:none;border-radius:999px;padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;
+  font-family:inherit;margin-top:16px}
+.sell-btn:hover{opacity:.88}
+.toast{position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);
+  background:var(--ink);color:var(--white);font-size:13px;font-weight:600;padding:12px 22px;
+  border-radius:999px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;
+  display:flex;align-items:center;gap:8px;z-index:50}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast-dot{width:8px;height:8px;border-radius:50%;background:var(--signal)}
+
+/* 재등록 레이더 */
+.radar-rule{font-size:12px;color:var(--sub);background:var(--bg);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:10px 14px;margin-bottom:16px;line-height:1.6}
+.radar-list{list-style:none;margin:0;padding:0}
+.radar-row{display:flex;align-items:center;gap:12px;padding:12px 8px;border-radius:var(--r-sm);
+  cursor:pointer;border:1px solid transparent}
+.radar-row:hover{background:var(--bg)}
+.radar-row.active{border-color:var(--ink);background:var(--bg)}
+.radar-name{font-size:13.5px;font-weight:700;color:var(--ink);min-width:64px}
+.radar-dday{font-size:11.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);
+  border-radius:999px;padding:2px 9px}
+.radar-meta{font-size:11.5px;color:var(--sub);margin-left:auto;white-space:nowrap}
+.radar-mini{--u:8px;max-width:120px;margin-left:6px}
+.radar-mini .strip-week{margin:2px 0}
+
+/* 회원 상세 */
+.member-detail{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.member-detail-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.member-detail-name{font-size:16px;font-weight:800;color:var(--ink)}
+.member-detail-meta{font-size:12px;color:var(--sub)}
+.member-strip-wrap{margin:14px 0 10px}
+.member-line{font-size:13.5px;font-weight:700;color:var(--ink);margin:10px 0 0}
+
+/* 금지어·오용 방지용 각주 */
+.foot-note{font-size:11px;color:var(--soft);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ① 헤더 -->
+  <div class="dash-header">
+    <div class="dash-header-left">
+      <svg width="44" height="28" viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg" aria-label="디디다 심벌 — 방사 연결"><g stroke="#f0532f" stroke-width="11" fill="none" stroke-linejoin="round"><path d="M10,118 L166,115 L330,106"/><path d="M156,14 L169,106 L176,206"/><path d="M86,186 L176,112 L262,34"/></g><g fill="#1a2233"><circle cx="10" cy="118" r="17"/><circle cx="330" cy="106" r="17"/><circle cx="156" cy="14" r="17"/><circle cx="176" cy="206" r="17"/><circle cx="86" cy="186" r="17"/><circle cx="262" cy="34" r="17"/></g></svg>
+      <div>
+        <p class="dash-title">디디다 매니저</p>
+        <p class="dash-tagline">디딘 만큼 보이고, 빈 만큼 팝니다</p>
+      </div>
+    </div>
+    <p class="dash-date num" id="dashDate"></p>
+  </div>
+
+  <!-- ② 오늘 요약 -->
+  <div class="stats-grid" id="statsGrid"></div>
+
+  <!-- ③ 출석률 히트맵 -->
+  <div class="card" id="heatmapCard">
+    <p class="card-title">출석률 히트맵</p>
+    <p class="card-sub">시간대별 · 요일별 출석 현황 — 최근 4주 태그 인증 출석 기준 · 레인 정원 12명<span class="assume-badge">가정</span></p>
+    <div class="heatmap-scroll">
+      <table class="heatmap" id="heatmapTable"></table>
+    </div>
+    <div class="heatmap-legend">
+      <span>출석률 낮음</span>
+      <span class="legend-scale" id="legendScale"></span>
+      <span>출석률 높음</span>
+      <span class="legend-dot"></span>
+      <span>출석률 70% 미만 — 판매 가능 신호</span>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- ④ 빈자리 상품 패널 -->
+    <div class="card" id="productCard">
+      <p class="card-title">빈자리 상품</p>
+      <p class="card-sub">히트맵 칸을 선택하면 해당 시간대의 판매 가능 빈자리가 갱신됩니다</p>
+      <table class="product-table" id="productTable">
+        <thead>
+          <tr>
+            <th>시간대</th><th>정원</th><th>평균 출석(4주)</th><th>빈자리</th><th>예상 매출(주간)<span class="price-row-badge">가정</span></th>
+          </tr>
+        </thead>
+        <tbody id="productBody"></tbody>
+      </table>
+      <button class="sell-btn" id="sellBtn" type="button">판매 페이지에 올리기</button>
+      <p class="foot-note">일일권 20,000원 · 당일 보강권 15,000원 — AOS 확정 전 가정 가격</p>
+    </div>
+
+    <!-- ⑤ 재등록 레이더 -->
+    <div class="card" id="radarCard">
+      <p class="card-title">재등록 레이더</p>
+      <p class="card-sub">만료 임박 회원</p>
+      <p class="radar-rule">재등록기간 6/18–25 · 정규가로 자리 유지</p>
+      <ul class="radar-list" id="radarList"></ul>
+
+      <!-- ⑥ 회원 상세 -->
+      <div class="member-detail" id="memberDetail"></div>
+    </div>
+  </div>
+
+  <p class="foot-note">디디다 매니저 · 목업 화면 — 표시된 수치는 예시 데이터입니다</p>
+</div>
+
+<div class="toast" id="toast"><span class="toast-dot"></span><span id="toastText"></span></div>
+
+<script>
+/* ============================================================
+   모스 스트립 렌더러 (정본 — Task 1에서 그대로 복사)
+   days: 그 달 일수, attended: 출석 일 배열
+   ============================================================ */
+function buildStrip(el, days, attended){
+  var set=new Set(attended), html='';
+  for(var w=0; w*7<days; w++){
+    html+='<div class="strip-week">';
+    for(var d=w*7+1; d<=Math.min(days,(w+1)*7); d++){
+      var on=set.has(d), prev=set.has(d-1)&&d>w*7+1;    /* 주 경계에서 선 끊음 */
+      html+= on ? (prev?'<span class="seg link"></span><span class="seg dot on"></span>'
+                       :'<span class="seg dot on"></span>')
+                : '<span class="seg dot off"></span>';
+    }
+    html+='</div>';
+  }
+  el.innerHTML=html;
+}
+
+/* ============================================================
+   Step 1 — 데이터 모델 (AOS 실측 + 가정 라벨)
+   시간대×요일 4주 평균 출석. cap=레인 정원(가정: 12명 — AOS 확정 전)
+   ============================================================ */
+var SLOTS=[ /* 매일반 오전 08–11 (실운영), 오후·저녁 */
+ {time:'08:00',cap:12,att:[11,12,10,11,12,9]},   /* 월~토 4주 평균 */
+ {time:'09:00',cap:12,att:[12,12,11,12,12,10]},
+ {time:'10:00',cap:12,att:[9,10,8,9,10,7]},
+ {time:'14:00',cap:12,att:[5,6,4,5,6,4]},
+ {time:'18:00',cap:12,att:[10,11,9,10,11,8]},
+ {time:'19:00',cap:12,att:[12,11,12,12,11,9]} ];
+var PRICE_DAY=20000, PRICE_MAKEUP=15000;   /* 일일권·당일 보강권 — 가정 가격 */
+function sellable(cap,avgAtt){return Math.max(0,cap-Math.ceil(avgAtt));}  /* 빈자리 = 정원 − 평균 출석(올림) */
+
+var DAY_LABELS=['월','화','수','목','금','토'];
+
+function avgAtt(slot){
+  var sum=0; for(var i=0;i<slot.att.length;i++) sum+=slot.att[i];
+  return sum/slot.att.length;
+}
+
+/* ============================================================
+   재등록 레이더 데모 데이터
+   ============================================================ */
+var MEMBERS=[
+  {name:'김서연', dday:3, monthAtt:11, days:[2,3,5,7,9,10,12,14,16,18,20]},
+  {name:'이도현', dday:5, monthAtt:9,  days:[1,4,6,8,11,13,15,18,20]},
+  {name:'박지민', dday:1, monthAtt:12, days:[1,2,3,5,6,8,9,11,12,14,15,17]}
+];
+
+var selectedSlotIdx=0, selectedMemberIdx=0;
+
+/* ============================================================
+   데모 기준일 — 고정값
+   ============================================================ */
+var DEMO_DATE={label:'2026.06.19 (금)', dayIdx:4};
+
+/* ============================================================
+   헤더 날짜
+   ============================================================ */
+(function(){
+  var dateLbl=document.getElementById('dashDate');
+  dateLbl.textContent=DEMO_DATE.label+' 기준';
+  var caption=document.createElement('span');
+  caption.textContent='데모 기준일';
+  caption.style.cssText='display:block;margin-top:4px;color:var(--soft);font-size:11px';
+  dateLbl.appendChild(caption);
+})();
+
+/* ============================================================
+   ② 오늘 요약 스탯
+   ============================================================ */
+function renderStats(){
+  var todayIdx = DEMO_DATE.dayIdx;                  /* 데모 기준일의 요일 인덱스 — 0=월 ... 5=토 */
+
+  var todayAtt=0, totalAtt=0, totalCap=0, totalSellable=0, weeklyRevenue=0;
+  SLOTS.forEach(function(s){
+    todayAtt+=s.att[todayIdx];
+    s.att.forEach(function(v){ totalAtt+=v; totalCap+=s.cap; });
+    var sc=sellable(s.cap, avgAtt(s));
+    totalSellable+=sc;
+    weeklyRevenue += sc * 6 * PRICE_DAY;            /* 빈자리 × 요일 × 일일권가 */
+  });
+  var attRate = totalAtt/totalCap*100;
+  var monthlyRevenue = weeklyRevenue * 4;           /* 4주 기준 */
+
+  var stats=[
+    {label:'오늘 출석', value:todayAtt.toLocaleString(), unit:'명'},
+    {label:'평균 출석률', value:attRate.toFixed(1), unit:'%'},
+    {label:'판매 가능 빈자리 합계', value:totalSellable.toLocaleString(), unit:'자리', accent:true},
+    {label:'이번 달 빈자리 매출', value:monthlyRevenue.toLocaleString(), unit:'원', assume:true}
+  ];
+  var html='';
+  stats.forEach(function(s){
+    html+='<div class="stat-card"><p class="stat-label">'+s.label+(s.assume?'<span class="assume-badge">가정</span>':'')+'</p>'+
+      '<p class="stat-value num'+(s.accent?' accent':'')+'">'+s.value+'<span class="unit">'+s.unit+'</span></p>'+
+      (s.assume?'<p class="stat-foot">일일권 20,000원 기준 · 시간대 × 요일 × 4주 환산</p>':'')+
+      '</div>';
+  });
+  document.getElementById('statsGrid').innerHTML=html;
+}
+
+/* ============================================================
+   ③ 히트맵 — 칸 배경은 --line~--ink 5단계, 액센트는 빈자리 배지 전용
+   ============================================================ */
+var HEAT_STOPS=['#e6e9ef','#b3b7c0','#808691','#4d5462','#1a2233'];
+function heatLevel(rate){ return Math.min(4, Math.floor(rate/0.2)); }
+
+function renderHeatmap(){
+  var html='<thead><tr><th></th>';
+  DAY_LABELS.forEach(function(d){ html+='<th>'+d+'</th>'; });
+  html+='</tr></thead><tbody>';
+
+  SLOTS.forEach(function(slot, si){
+    html+='<tr><td class="time-cell num">'+slot.time+'</td>';
+    slot.att.forEach(function(v, di){
+      var rate=v/slot.cap;
+      var level=heatLevel(rate);
+      var bg=HEAT_STOPS[level];
+      var lightText=level>=3;
+      var badge = rate<0.7 ? '<span class="badge-dot" aria-label="판매 가능 신호"></span>' : '';
+      html+='<td><div class="cell'+(si===selectedSlotIdx?' selected':'')+'" '+
+        'style="background:'+bg+';color:'+(lightText?'#fff':'var(--ink)')+'" '+
+        'data-slot="'+si+'" role="button" aria-label="'+slot.time+' '+DAY_LABELS[di]+'요일 '+v+'명/'+slot.cap+'명">'+
+        '<span class="num">'+v+'/'+slot.cap+'</span>'+badge+'</div></td>';
+    });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('heatmapTable').innerHTML=html;
+
+  document.querySelectorAll('.cell').forEach(function(cell){
+    cell.addEventListener('click', function(){
+      selectedSlotIdx=parseInt(cell.getAttribute('data-slot'),10);
+      renderHeatmap();
+      renderProductPanel();
+      document.getElementById('productCard').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  });
+
+  var legend=document.getElementById('legendScale');
+  legend.innerHTML = HEAT_STOPS.map(function(c){ return '<span style="background:'+c+'"></span>'; }).join('');
+}
+
+/* ============================================================
+   ④ 빈자리 상품 패널 — sellable() 소비 (Task 3과 동일 규칙 공유)
+   ============================================================ */
+function renderProductPanel(){
+  var html='';
+  SLOTS.forEach(function(slot, si){
+    var a=avgAtt(slot);
+    var sc=sellable(slot.cap, a);
+    var revenue = sc * 6 * PRICE_DAY;
+    html+='<tr class="'+(si===selectedSlotIdx?'active':'')+'" data-slot="'+si+'">'+
+      '<td class="num">'+slot.time+'</td>'+
+      '<td class="num">'+slot.cap+'명</td>'+
+      '<td class="num">'+a.toFixed(1)+'명</td>'+
+      '<td class="num sellable-count'+(sc>0?' has':'')+'">'+sc+'자리</td>'+
+      '<td class="num">'+revenue.toLocaleString()+'원</td>'+
+      '</tr>';
+  });
+  document.getElementById('productBody').innerHTML=html;
+
+  document.querySelectorAll('#productBody tr').forEach(function(row){
+    row.addEventListener('click', function(){
+      selectedSlotIdx=parseInt(row.getAttribute('data-slot'),10);
+      renderHeatmap();
+      renderProductPanel();
+    });
+  });
+}
+
+document.getElementById('sellBtn').addEventListener('click', function(){
+  var toast=document.getElementById('toast');
+  document.getElementById('toastText').textContent='판매 페이지에 반영됐습니다';
+  toast.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+});
+
+/* ============================================================
+   ⑤ 재등록 레이더 + ⑥ 회원 상세
+   ============================================================ */
+function renderRadar(){
+  var html='';
+  MEMBERS.forEach(function(m, mi){
+    html+='<li class="radar-row'+(mi===selectedMemberIdx?' active':'')+'" data-member="'+mi+'">'+
+      '<span class="radar-name">'+m.name+'</span>'+
+      '<span class="radar-dday num">D-'+m.dday+'</span>'+
+      '<span class="radar-meta num">이번 달 출석 '+m.monthAtt+'회</span>'+
+      '<span class="radar-mini" id="miniStrip'+mi+'"></span>'+
+      '</li>';
+  });
+  document.getElementById('radarList').innerHTML=html;
+
+  MEMBERS.forEach(function(m, mi){
+    buildStrip(document.getElementById('miniStrip'+mi), 30, m.days);
+  });
+
+  document.querySelectorAll('.radar-row').forEach(function(row){
+    row.addEventListener('click', function(){
+      selectedMemberIdx=parseInt(row.getAttribute('data-member'),10);
+      renderRadar();
+      renderMemberDetail();
+    });
+  });
+}
+
+function renderMemberDetail(){
+  var m=MEMBERS[selectedMemberIdx];
+  var wrap=document.getElementById('memberDetail');
+  wrap.innerHTML=
+    '<div class="member-detail-head"><span class="member-detail-name">'+m.name+'</span>'+
+    '<span class="member-detail-meta num">만료 D-'+m.dday+' · 이번 달 출석 '+m.monthAtt+'회</span></div>'+
+    '<div class="member-strip-wrap" id="memberStrip"></div>'+
+    '<p class="member-line">이어진 회원이 재등록합니다</p>';
+  buildStrip(document.getElementById('memberStrip'), 30, m.days);
+}
+
+/* ============================================================
+   초기 렌더
+   ============================================================ */
+renderStats();
+renderHeatmap();
+renderProductPanel();
+renderRadar();
+renderMemberDetail();
+</script>
+</body>
+</html>
