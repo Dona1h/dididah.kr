@@ -1,306 +1,84 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>디디다 DIDIDAH — 점이 두 개 찍히면, 이어진다</title>
-<meta name="description" content="출석이 기록이 되고, 기록이 연결이 되는 피트니스 멤버십 도구. EVERY TRY CONNECTS.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=42dot+Sans:wght@300;400;500;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 171 20"><g fill="%23f0532f"><circle cx="10" cy="10" r="10"/><circle cx="52" cy="10" r="10"/><rect x="84" width="87" height="20" rx="10"/></g></svg>'>
-<style>
-  :root{
-    --ink:#191919;
-    --cream:#fffaee;
-    --cream-60:#b9b5aa;
-    --paper:#f4f1e8;
-    --signal:#f0532f;
-    --signal-text:#b5310f;
-    --dot42:"42dot Sans",sans-serif;
-    --mono:"IBM Plex Mono",monospace;
-    --u:240ms;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{font-family:var(--dot42);color:var(--ink);background:var(--paper)}
-
-  /* ───────── 헤더 ───────── */
-  .top{position:fixed;inset:0 0 auto;z-index:10;display:flex;justify-content:space-between;align-items:center;padding:16px 24px;mix-blend-mode:difference;color:#fff}
-  .top .wm{font-weight:500;font-size:14px;letter-spacing:.2em}
-  .top a{color:inherit;text-decoration:none;font-family:var(--mono);font-size:11px;letter-spacing:.14em;border:1px solid currentColor;padding:6px 12px;border-radius:99px}
-
-  /* ───────── 히어로 ───────── */
-  .hero{min-height:100svh;background:var(--ink);color:var(--cream);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:96px 20px 64px;position:relative}
-  .hero .sym{width:min(42vw,210px);display:block;cursor:pointer}
-  .hero .name{margin-top:38px;font-weight:300;font-size:clamp(34px,7vw,60px);letter-spacing:.2em;text-indent:.2em;line-height:1}
-  .hero .tag{margin-top:20px;font-weight:400;font-size:clamp(11px,2vw,13px);letter-spacing:.34em;text-indent:.34em;text-align:center}
-  .hero .sub{margin-top:24px;font-weight:300;font-size:clamp(13px,2.4vw,16px);color:var(--cream-60);letter-spacing:.02em;text-align:center;line-height:1.9}
-  .hero .cta{margin-top:38px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-  .hero .cta a{text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.14em;padding:13px 26px;border-radius:99px}
-  .hero .cta .p{background:var(--signal);color:#fff}
-  .hero .cta .s{border:1px solid var(--cream-60);color:var(--cream)}
-  .hero .hint{position:absolute;bottom:18px;font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;color:#666}
-
-  /* 드로잉 모션 */
-  .sym .dot{transform-origin:center;transform-box:fill-box}
-  .playing .dot{opacity:0;animation:pop .32s cubic-bezier(.34,1.56,.64,1) forwards}
-  @keyframes pop{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
-  .playing .d1{animation-delay:0ms}
-  .playing .d2{animation-delay:var(--u)}
-  .playing .d3{animation-delay:calc(var(--u)*1.28)}
-  .playing .d4{animation-delay:calc(var(--u)*1.52)}
-  .playing .d5{animation-delay:calc(var(--u)*1.76)}
-  .playing .d6{animation-delay:calc(var(--u)*2)}
-  .sym .ray{stroke-dasharray:1;stroke-dashoffset:0}
-  .playing .ray{stroke-dashoffset:1;animation:draw calc(var(--u)*3) cubic-bezier(.22,1,.36,1) forwards;animation-delay:calc(var(--u)*2.3)}
-  @keyframes draw{to{stroke-dashoffset:0}}
-  @media (prefers-reduced-motion: reduce){
-    .playing .dot,.playing .ray{animation:none;opacity:1;stroke-dashoffset:0}
-  }
-
-  /* ───────── 등식 스트립 ───────── */
-  .eqband{background:var(--ink);color:var(--cream);padding:0 20px 96px;display:flex;flex-direction:column;align-items:center;gap:30px}
-  .eqband .eq{display:flex;align-items:center;gap:22px}
-  .eqband .eq i{display:block;width:16px;height:16px;border-radius:50%;background:var(--cream)}
-  .eqband .eq em{font-style:normal;font-weight:400;font-size:24px}
-  .eqband .eq b{display:block;width:70px;height:16px;border-radius:8px;background:var(--signal)}
-  .eqband p{font-weight:300;font-size:14.5px;color:var(--cream-60);text-align:center;line-height:2;max-width:520px}
-  .eqband p b{font-weight:500;color:var(--cream)}
-
-  /* ───────── 섹션 공통 ───────── */
-  section.block{max-width:1040px;margin:0 auto;padding:112px 24px}
-  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.28em;color:var(--signal-text);margin-bottom:20px}
-  h2.title{font-weight:500;font-size:clamp(24px,4.4vw,36px);letter-spacing:-.01em;line-height:1.4}
-  .lead{margin-top:16px;font-weight:300;font-size:15.5px;line-height:2;color:#555}
-
-  /* How it works — 에디토리얼 3스텝 */
-  .flow{margin-top:60px;display:grid;grid-template-columns:repeat(3,1fr);gap:0}
-  .fstep{padding:6px 30px;border-left:1px solid #ddd8ca}
-  .fstep:first-child{padding-left:0;border-left:none}
-  .fnum{font-family:var(--mono);font-size:34px;font-weight:400;color:#d8d2c4;letter-spacing:.02em}
-  .fstep h3{margin-top:22px;font-weight:500;font-size:18px;line-height:1.55}
-  .fstep p{margin-top:14px;font-weight:300;font-size:13.5px;line-height:1.95;color:#666}
-
-  /* Two sides — 클릭 시 목업 열림 */
-  .duo{margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:20px}
-  .duo .card{display:block;width:100%;text-align:left;font-family:inherit;cursor:pointer;border-radius:18px;padding:38px 34px;min-height:240px;display:flex;flex-direction:column;justify-content:space-between;transition:transform .2s ease, box-shadow .2s ease}
-  .duo .card:hover{transform:translateY(-5px)}
-  .duo .op{background:var(--ink);color:var(--cream);border:none}
-  .duo .op:hover{box-shadow:0 18px 40px rgba(0,0,0,.28)}
-  .duo .me{background:#fff;border:1px solid #e4e0d5}
-  .duo .me:hover{box-shadow:0 18px 40px rgba(0,0,0,.10)}
-  .duo .who{font-family:var(--mono);font-size:11px;letter-spacing:.24em}
-  .duo .op .who{color:var(--cream-60)}
-  .duo .me .who{color:var(--signal-text)}
-  .duo h3{margin-top:14px;font-weight:500;font-size:21px;line-height:1.5}
-  .duo p{margin-top:12px;font-weight:300;font-size:13.5px;line-height:1.95}
-  .duo .op p{color:var(--cream-60)}
-  .duo .me p{color:#666}
-  .duo .peek{margin-top:26px;font-family:var(--mono);font-size:12px;letter-spacing:.12em;display:inline-flex;align-items:center;gap:8px}
-  .duo .op .peek{color:var(--cream)}
-  .duo .me .peek{color:var(--signal-text)}
-  .duo .peek .ar{transition:transform .2s ease}
-  .duo .card:hover .peek .ar{transform:translateX(4px)}
-
-  /* ───────── CONNECTED ───────── */
-  .connected{background:var(--ink);color:var(--cream);padding:120px 24px;display:flex;flex-direction:column;align-items:center;gap:22px}
-  .connected .line{font-weight:500;font-size:clamp(16px,3.4vw,24px);letter-spacing:.28em;text-indent:.28em;text-align:center}
-  .connected .cap{font-weight:300;font-size:13px;color:var(--cream-60);letter-spacing:.04em;text-align:center}
-
-  /* 푸터 */
-  footer{background:var(--ink);color:var(--cream-60);padding:0 24px 54px}
-  footer .inner{max-width:1040px;margin:0 auto;border-top:1px solid #333;padding-top:34px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-  footer .fwm{font-weight:500;font-size:13px;letter-spacing:.2em;color:var(--cream)}
-  footer .meta{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;line-height:2;text-align:right}
-
-  /* ───────── 목업 모달 ───────── */
-  .modal{position:fixed;inset:0;z-index:100;background:rgba(10,10,10,.72);backdrop-filter:blur(3px);display:none;flex-direction:column;padding:20px}
-  .modal.open{display:flex}
-  .modal-bar{display:flex;justify-content:space-between;align-items:center;max-width:1040px;width:100%;margin:0 auto 12px;color:#fff}
-  .modal-bar .mt{font-family:var(--mono);font-size:12px;letter-spacing:.14em}
-  .modal-bar button{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:8px 16px;cursor:pointer}
-  .modal-frame-wrap{flex:1;max-width:1040px;width:100%;margin:0 auto;border-radius:16px;overflow:hidden;background:#fff}
-  .modal iframe{width:100%;height:100%;border:0;display:block}
-
-  @media (max-width:760px){
-    .hero .sym{width:min(52vw,180px)}
-    .flow{grid-template-columns:1fr;gap:0}
-    .fstep{padding:26px 0;border-left:none;border-top:1px solid #ddd8ca}
-    .fstep:first-child{border-top:none;padding-top:0}
-    .duo{grid-template-columns:1fr}
-    section.block{padding:80px 20px}
-  }
-</style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#f7f8f2">
+<title>디디다 dididah — 오늘의 출석이, 내일의 나로</title>
+<meta name="description" content="출석을 기록하고, 성장을 발견하고, 다시 연결되는 경험. 회원과 센터의 다음을 함께 만드는 피트니스 멤버십 도구, 디디다.">
+<link rel="canonical" href="https://dididah.kr/">
+<meta property="og:type" content="website"><meta property="og:title" content="디디다 — 오늘의 출석이, 내일의 나로"><meta property="og:description" content="한 번의 닿음에서 시작되는, 함께 성장하는 일상."><meta property="og:url" content="https://dididah.kr/"><meta property="og:image" content="https://dididah.kr/assets/app-icon.png">
+<link rel="icon" type="image/svg+xml" href="assets/logo-app-black.svg"><link rel="apple-touch-icon" href="assets/app-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=42dot+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20261012-morse"><script src="script.js?v=20261012" defer></script>
 </head>
 <body>
-
-<header class="top">
-  <span class="wm">DIDIDAH</span>
-  <a href="mailto:hello@dididah.kr">도입 문의</a>
+<a class="skip-link" href="#main">본문으로 바로가기</a>
+<header class="site-header">
+<a class="brand" href="#" aria-label="디디다 홈"><img src="assets/logo-web-black.svg" width="88" height="41" alt=""><span>dididah.</span></a>
+<button class="menu-toggle" aria-expanded="false" aria-controls="site-nav">메뉴 <span aria-hidden="true">＋</span></button>
+<nav id="site-nav" aria-label="주 메뉴"><a href="#experience">디디다의 경험</a><a href="#together">회원과 센터</a><a href="#story">브랜드 이야기</a><a class="nav-contact" href="#contact">도입 문의 <span aria-hidden="true">↗</span></a></nav>
 </header>
-
-<!-- ───────── 히어로 ───────── -->
-<section class="hero">
-  <svg id="sym" class="sym" viewBox="0 0 340 220" fill="none" role="img" aria-label="디디다 심벌 — 여섯 개의 점이 중심에서 방사선으로 연결됩니다">
-    <g stroke="#f0532f" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
-      <path class="ray" pathLength="1" d="M166,115 L10,118"/>
-      <path class="ray" pathLength="1" d="M166,115 L330,106"/>
-      <path class="ray" pathLength="1" d="M169,106 L156,14"/>
-      <path class="ray" pathLength="1" d="M169,106 L176,206"/>
-      <path class="ray" pathLength="1" d="M176,112 L86,186"/>
-      <path class="ray" pathLength="1" d="M176,112 L262,34"/>
-    </g>
-    <g fill="#fffaee">
-      <circle class="dot d1" cx="10" cy="118" r="6"/>
-      <circle class="dot d2" cx="156" cy="14" r="6"/>
-      <circle class="dot d3" cx="330" cy="106" r="6"/>
-      <circle class="dot d4" cx="176" cy="206" r="6"/>
-      <circle class="dot d5" cx="86" cy="186" r="6"/>
-      <circle class="dot d6" cx="262" cy="34" r="6"/>
-    </g>
-  </svg>
-  <h1 class="name">DIDIDAH</h1>
-  <p class="tag">EVERY TRY CONNECTS</p>
-  <p class="sub">출석이 기록이 되고, 기록이 연결이 되는<br>피트니스 멤버십 도구 — 디디다</p>
-  <div class="cta">
-    <a class="p" href="mailto:hello@dididah.kr">도입 문의하기</a>
-    <a class="s" href="#concept">디디다 알아보기</a>
-  </div>
-  <p class="hint">심벌을 누르면 디·디·다 리듬으로 다시 그려집니다</p>
+<main id="main">
+<section class="hero section-shell" aria-labelledby="hero-title">
+<div class="hero-copy"><p class="eyebrow"><span class="signal-dot" aria-hidden="true"></span> EVERY TRY CONNECTS</p><h1 id="hero-title">오늘의 출석이,<br>내일의 나로<br>이어지도록<span class="period">.</span></h1><p class="hero-description">센터에 닿는 작은 순간부터.<br>나의 기록이 쌓이고, 함께할 이유가 생기는 곳.<br>디디다는 꾸준함이 성장으로 이어지게 합니다.</p><div class="hero-actions"><a class="button button-dark" href="#together">디디다 미리 만나기 <span aria-hidden="true">↗</span></a><a class="text-link" href="#experience">어떻게 이어지나요? ↓</a></div><p class="hero-note">회원과 센터를 잇는 피트니스 멤버십 도구</p></div>
+<div class="hero-stage" aria-label="출석 기록 화면 예시"><div class="stage-topline"><span>YOUR EVERYDAY, CONNECTED.</span><span>01 — ∞</span></div><div class="orbit orbit-one" aria-hidden="true"></div><div class="orbit orbit-two" aria-hidden="true"></div>
+<div class="today-card"><div class="card-top"><img src="assets/logo-web-black.svg" alt="디디다" width="88" height="41"><span class="sample-label">화면 예시</span></div><div class="greeting"><p>나를 위한 오늘의 한 걸음</p><h2>오늘도, 잘 오셨어요.</h2></div><div class="month-summary"><span>10월의 꾸준함</span><span><strong id="visit-count">7</strong> <span class="muted">/ 12회 목표</span></span></div>
+<div class="calendar" aria-label="10월 출석 예시, 목표 12회 중 7회 출석"><div class="weekdays" aria-hidden="true"><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span></div><div class="days" aria-hidden="true">
+<span class="other">28</span><span class="other">29</span><span class="other">30</span><span class="attended">1</span><span>2</span><span class="attended">3</span><span>4</span>
+<span class="attended">5</span><span>6</span><span class="attended">7</span><span class="attended">8</span><span>9</span><span class="attended">10</span><span class="attended">11</span>
+<span class="today" id="today-cell">12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span class="other">1</span>
+</div></div><div class="record-line"><span class="tiny-dot" aria-hidden="true"></span><p id="record-message" role="status">오늘의 출석을 더해 볼까요?</p></div><button class="tag-button" id="tag-button"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 8a6 6 0 0 1 0 8M9 5a10 10 0 0 1 0 14M13 2a14 14 0 0 1 0 20" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>출석 태그 체험하기</span><span aria-hidden="true">＋</span></button><button class="reset-demo" id="reset-demo" hidden>다시 체험하기 ↺</button></div>
+<div class="little-note"><span class="note-star" aria-hidden="true">✳</span><div>잘하고 있어요.<br><strong>당신만의 속도로.</strong></div></div><p class="stage-caption"><span class="caption-dot" aria-hidden="true"></span> 체험용 데이터입니다. 실제 출석은 기록되지 않아요.</p></div>
 </section>
-
-<!-- ───────── 등식 ───────── -->
-<div class="eqband" id="concept">
-  <div class="eq" aria-label="점 점 은 선과 같다">
-    <i></i><i></i><em>=</em><b></b>
-  </div>
-  <p><b>"점이 두 개 찍히면, 이어진다."</b><br>
-  오늘 한 번의 방문이 점 하나. 다음 방문이 점 하나 더.<br>
-  두 점은 선이 되고, 선은 흐름이 됩니다.<br>
-  오늘의 점과 일주일 뒤의 점도, 수영의 점과 필라테스의 점도 —<br>
-  디디다 안에서는 모든 시도가 서로 이어질 수 있습니다.</p>
-</div>
-
-<!-- ───────── 서비스 3단계 ───────── -->
-<section class="block">
-  <p class="kicker">HOW IT WORKS</p>
-  <h2 class="title">태그 한 번에서 시작해,<br>빈자리 매출까지 이어집니다</h2>
-  <div class="flow">
-    <div class="fstep">
-      <span class="fnum">01</span>
-      <h3>태그 한 번으로<br>출석이 기록됩니다</h3>
-      <p>입장할 때 태그 한 번. 출석은 자동으로 점이 되어 회원의 기록에 남습니다.</p>
-    </div>
-    <div class="fstep">
-      <span class="fnum">02</span>
-      <h3>출석률이 보이면<br>빈자리가 상품이 됩니다</h3>
-      <p>시간대별 출석률이 한눈에. 비는 자리는 일일권·보강권으로 바로 판매합니다.</p>
-    </div>
-    <div class="fstep">
-      <span class="fnum">03</span>
-      <h3>쌓인 기록이<br>재등록을 만듭니다</h3>
-      <p>회원은 자기 성장을 확인하고, 운영자는 만료 임박 회원을 놓치지 않습니다.</p>
-    </div>
-  </div>
-</section>
-
-<!-- ───────── 양면 ───────── -->
-<section class="block" style="padding-top:0">
-  <p class="kicker">TWO SIDES, ONE RECORD</p>
-  <h2 class="title">운영자와 회원이<br>같은 기록을 다른 화면으로 봅니다</h2>
-  <div class="duo">
-    <button class="card op" type="button" data-demo="demo/operator.html" data-title="디디다 매니저 · 운영자 데모">
-      <div>
-        <p class="who">FOR OPERATORS</p>
-        <h3>디디다 매니저</h3>
-        <p>출석률 히트맵 · 빈자리 상품 기획 · 재등록 레이더.<br>"디딘 만큼 보이고, 빈 만큼 팝니다."</p>
+<div class="connection-strip section-shell"><span>작은 시작이</span><div class="connection-track" aria-hidden="true"><i></i><i></i><b></b></div><span>꾸준한 나로, 함께하는 우리로.</span><a href="#experience" aria-label="디디다의 경험 알아보기">↓</a></div>
+<section class="experience section-shell section-space" id="experience" aria-labelledby="experience-title"><div class="section-heading"><div><p class="eyebrow">01 / THE EXPERIENCE</p><h2 id="experience-title">등록 그다음의 이야기가<br>더 중요하니까.</h2></div><p class="section-description">몇 명이 등록했는지를 넘어,<br>누가 계속하고 있고 어떻게 성장하는지.<br>디디다는 그다음의 경험을 연결합니다.</p></div>
+<div class="journey-grid">
+<article class="journey"><div class="step-heading"><span>01</span><span>닿다</span></div><div class="step-visual visual-touch" aria-hidden="true"><div class="tag-reader"><img src="assets/logo-web-black.svg" alt="" width="100" height="47"><span class="reader-light"></span></div><div class="touch-label"><i></i> 오늘의 나, 도착.</div></div><h3>오는 것부터, 의미 있게.</h3><p>센터에 닿는 순간이 하나의 기록이 됩니다.<br>작은 출석을 놓치지 않는 것부터 시작합니다.</p></article>
+<article class="journey"><div class="step-heading"><span>02</span><span>쌓이다</span></div><div class="step-visual visual-growth" aria-hidden="true"><div class="growth-bars"><i style="--bar:25%"></i><i style="--bar:40%"></i><i style="--bar:36%"></i><i style="--bar:62%"></i><i style="--bar:77%"></i><i style="--bar:100%"></i></div><div class="growth-caption"><span>어제의 나</span><span>오늘의 나 ↗</span></div></div><h3>꾸준함이 눈에 보이게.</h3><p>나의 출석과 활동을 한눈에 돌아봅니다.<br>남과의 비교 대신, 나만의 변화를 발견합니다.</p></article>
+<article class="journey"><div class="step-heading"><span>03</span><span>이어지다</span></div><div class="step-visual visual-connect" aria-hidden="true"><div class="person person-one">나</div><div class="connect-line"></div><div class="person person-two">함께</div><span class="connect-caption">다음에도, 같이.</span></div><h3>다시 오고 싶은 이유로.</h3><p>회원의 기록은 코치와 센터의 관심으로.<br>서로를 이해하는 경험이 다음 방문을 만듭니다.</p></article>
+</div><p class="section-footnote">디디다가 만들어 가는 서비스 경험입니다. 아래 데모에서 현재 구상한 화면을 살펴보세요.</p></section>
+<section class="together section-space" id="together" aria-labelledby="together-title"><div class="section-shell"><div class="section-heading"><div><p class="eyebrow">02 / TWO SIDES, ONE CONNECTION</p><h2 id="together-title">나에게는 성장의 기록.<br>센터에게는 이해의 시작.</h2></div><div class="role-tabs" role="tablist" aria-label="사용자별 경험"><button id="member-tab" role="tab" aria-selected="true" aria-controls="member-panel" tabindex="0">회원의 경험</button><button id="operator-tab" role="tab" aria-selected="false" aria-controls="operator-panel" tabindex="-1">센터의 경험</button></div></div>
+<div class="role-panel" id="member-panel" role="tabpanel" aria-labelledby="member-tab" tabindex="0"><div class="role-copy"><span class="pill">FOR MEMBERS</span><h3>내가 쌓아 온 시간을<br>나의 자신감으로.</h3><p>오늘의 출석, 지나온 수업, 작은 성취까지.<br>흩어져 있던 나의 운동 일상을<br>하나의 흐름으로 돌아보세요.</p><ul class="feature-list"><li><span>01</span> 나의 출석과 수업 기록</li><li><span>02</span> 꾸준함을 발견하는 활동 히스토리</li><li><span>03</span> 코치와 이어지는 피드백</li></ul><button class="button button-dark" data-demo="member">회원 데모 둘러보기 <span aria-hidden="true">↗</span></button><small>예시 데이터로 구성한 데모입니다.</small></div>
+<div class="member-preview"><div class="preview-header"><span>MY JOURNEY</span><span>샘플 화면</span></div><div class="journey-profile"><div class="avatar" aria-hidden="true">J</div><div><p>지우님의 수영 기록</p><h4>어제보다, 조금 더 나답게.</h4></div></div><div class="member-stats"><div><strong>08<span>회</span></strong><span>이번 달의 출석</span></div><div><strong>03<span>주</span></strong><span>이어 온 발걸음</span></div></div><div class="timeline"><div><i></i><span>10.12</span><p><strong>오늘도 한 걸음 쌓았어요.</strong><br>자유형 · 기초 수영</p><span class="timeline-check">✓</span></div><div><i></i><span>10.10</span><p><strong>물속에서 더 편안해진 하루.</strong><br>호흡과 균형 연습</p></div><div><i></i><span>10.08</span><p><strong>내 속도에 맞춰, 꾸준히.</strong><br>자유형 · 기초 수영</p></div></div><div class="coach-note"><span aria-hidden="true">↳</span><p>“편안한 호흡을 찾고 있어요.<br>지금의 리듬을 함께 이어가 봐요.”<small>코치 피드백 예시</small></p></div></div></div>
+<div class="role-panel" id="operator-panel" role="tabpanel" aria-labelledby="operator-tab" tabindex="0" hidden><div class="role-copy"><span class="pill">FOR CENTERS</span><h3>숫자 뒤에 있는<br>한 사람을 발견하세요.</h3><p>방문이 뜸해진 회원, 곧 만료되는 이용권.<br>흩어진 운영 정보를 함께 보며<br>필요한 관심을 더 정확하게 전하세요.</p><ul class="feature-list"><li><span>01</span> 출석 흐름과 회원 현황</li><li><span>02</span> 만료 예정과 후속 관리</li><li><span>03</span> 운영 현장의 정책 계산 도구</li></ul><button class="button button-dark" data-demo="operator">운영자 데모 둘러보기 <span aria-hidden="true">↗</span></button><small>예시 데이터로 구성한 데모입니다.</small></div><div class="operator-preview"><div class="preview-header"><span>CENTER OVERVIEW</span><span>샘플 화면</span></div><h4>센터의 오늘을 한눈에.</h4><div class="operator-stats"><div><span>오늘 출석</span><strong>24<small>명</small></strong></div><div><span>이번 주 만료</span><strong>08<small>명</small></strong></div><div><span>관심이 필요한 회원</span><strong>03<small>명</small></strong></div></div><div class="member-table"><div class="table-head"><span>회원</span><span>최근 방문</span><span>확인할 내용</span></div><div><strong>김○우</strong><span>오늘</span><span class="table-pill">꾸준한 출석</span></div><div><strong>이○은</strong><span>3일 전</span><span class="table-pill pale">만료 예정</span></div><div><strong>박○준</strong><span>14일 전</span><span class="table-pill neutral">안부가 필요해요</span></div></div><p class="operator-caption">기록이 쌓일수록, 회원을 더 잘 이해할 수 있도록.</p></div></div>
+</div></section>
+<section class="brand-story" id="story" aria-labelledby="story-title">
+  <div class="section-shell">
+    <div class="story-grid">
+      <div class="story-symbol">
+        <img src="assets/logo-web-white.svg" width="576" height="268" alt="모스 부호 두 점과 긴 선, 알파벳 U를 함께 담은 디디다 로고">
+        <span>di · di · dah</span>
+        <div class="morse-meaning" aria-label="모스 부호 짧게, 짧게, 길게는 U. 디디다는 U에 당신이라는 의미를 더합니다."><span>··−</span><i aria-hidden="true">=</i><span>U</span><i aria-hidden="true">→</i><span>YOU</span></div>
+        <p class="symbol-caption">두 점과 하나의 선. 그 안에 담긴 당신.</p>
       </div>
-      <span class="peek">데모 열기 <span class="ar">→</span></span>
-    </button>
-    <button class="card me" type="button" data-demo="demo/member.html" data-title="디디다 회원 앱 · 회원 데모">
-      <div>
-        <p class="who">FOR MEMBERS</p>
-        <h3>디디다 회원 앱</h3>
-        <p>전자 회원증 · 이번 달 디딘 날들 · 나의 운동 히스토리.<br>"오늘도 디뎠다."</p>
+      <div class="story-copy">
+        <p class="eyebrow">03 / FROM MORSE TO YOU</p>
+        <h2 id="story-title">디디다의 신호가<br>향하는 곳은, 당신.</h2>
+        <p>멀리 떨어진 사람에게 말을 전하던 모스 부호.<br>두 번의 짧은 신호와 한 번의 긴 신호, <strong>··−</strong>는<br>알파벳 <strong>U</strong>입니다. 소리로 읽으면 <strong>di-di-dah.</strong></p>
+        <p>디디다는 이 U를 <strong>당신, YOU</strong>로 읽습니다.<br>신호 너머에 늘 누군가가 있었듯,<br>출석 기록 너머에도 한 사람의 이야기가 있으니까요.</p>
+        <p>센터로 향하는 두 걸음, 도착을 알리는 한 번의 닿음.<br>그 작은 신호를 알아보고, 쌓아 온 시간을 기억하며,<br>다음 걸음을 함께하는 것. 디디다가 연결하는 일입니다.</p>
+        <span class="story-signoff">EVERY TRY CONNECTS. TO YOU.</span>
       </div>
-      <span class="peek">데모 열기 <span class="ar">→</span></span>
-    </button>
+    </div>
+    <div class="story-archive">
+      <figure class="archive-image">
+        <a href="assets/morse-u-archive.png" target="_blank" rel="noopener" aria-label="모스 부호 교육자료 원본 이미지 새 창에서 보기"><img src="assets/morse-u-archive.png" width="1000" height="832" loading="lazy" alt="SIGNAL CORPS 교육자료의 U 행. Character U, Phonetic name Uncle, Character sound dididah가 나란히 적혀 있다."></a>
+        <figcaption>통신 교육자료 발췌 · 제공 이미지 <span>원본 보기 ↗</span></figcaption>
+      </figure>
+      <div class="archive-copy">
+        <p class="eyebrow">A SIGNAL WITH A HISTORY</p>
+        <h3>이름이 되기 전부터,<br>사람을 잇던 소리.</h3>
+        <p>19세기 전신의 시대부터 모스 부호는 짧고 긴 신호로 말을 전했습니다. 이 통신 교육자료에도 U의 소리는 ‘dididah’로 적혀 있습니다. 우리가 지은 이름 안에는, 이미 누군가에게 닿기 위해 쓰이던 리듬이 있습니다.</p>
+        <p>한때 거리를 건너 말을 전하던 신호.<br>이제 디디다는 그 리듬으로 당신의 어제와 오늘,<br>그리고 함께할 사람들을 잇고자 합니다.</p>
+        <div class="story-sources"><a href="https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1677-1-200910-I!!PDF-E.pdf" target="_blank" rel="noopener">국제 모스 부호의 U · ITU ↗</a><span>U에서 YOU로의 연결은 디디다의 브랜드 해석입니다.</span></div>
+      </div>
+    </div>
   </div>
 </section>
-
-<!-- ───────── CONNECTED ───────── -->
-<div class="connected">
-  <p class="line">EVERY TRY, CONNECTED.</p>
-  <p class="cap">지나간 시도는 사라지지 않습니다. 전부 이어져 있습니다.</p>
-</div>
-
-<!-- ───────── 푸터 ───────── -->
-<footer>
-  <div class="inner">
-    <span class="fwm">DIDIDAH</span>
-    <p class="meta">DIDIDAH.KR · SEOUL<br>&copy;2026 DIDIDAH. EVERY TRY CONNECTS.</p>
-  </div>
-</footer>
-
-<!-- ───────── 목업 모달 ───────── -->
-<div class="modal" id="demoModal" role="dialog" aria-modal="true" aria-label="목업 데모">
-  <div class="modal-bar">
-    <span class="mt" id="demoTitle"></span>
-    <button type="button" id="demoClose">닫기 ✕</button>
-  </div>
-  <div class="modal-frame-wrap">
-    <iframe id="demoFrame" title="목업 데모" loading="lazy"></iframe>
-  </div>
-</div>
-
-<script>
-(function(){
-  /* 심벌 드로잉 모션 */
-  var sym=document.getElementById('sym');
-  var UNIT=0.12;
-  function replay(withSound){
-    sym.classList.remove('playing');
-    void sym.getBoundingClientRect();
-    sym.classList.add('playing');
-    if(withSound) beep();
-  }
-  function beep(){
-    try{
-      var ctx=beep.ctx||(beep.ctx=new (window.AudioContext||window.webkitAudioContext)());
-      var t=ctx.currentTime+0.02;
-      [[t,UNIT,660],[t+UNIT*1.5,UNIT,660],[t+UNIT*3,UNIT*3,440]].forEach(function(n){
-        var o=ctx.createOscillator(),g=ctx.createGain();
-        o.type='sine';o.frequency.value=n[2];
-        g.gain.setValueAtTime(0.0001,n[0]);
-        g.gain.linearRampToValueAtTime(0.18,n[0]+0.015);
-        g.gain.setValueAtTime(0.18,n[0]+n[1]-0.03);
-        g.gain.linearRampToValueAtTime(0.0001,n[0]+n[1]);
-        o.connect(g).connect(ctx.destination);
-        o.start(n[0]);o.stop(n[0]+n[1]+0.02);
-      });
-    }catch(e){}
-  }
-  sym.addEventListener('click',function(){replay(true)});
-  window.addEventListener('load',function(){setTimeout(function(){replay(false)},300)});
-
-  /* 목업 모달 */
-  var modal=document.getElementById('demoModal');
-  var frame=document.getElementById('demoFrame');
-  var mtitle=document.getElementById('demoTitle');
-  function openDemo(src,title){
-    frame.src=src;mtitle.textContent=title;
-    modal.classList.add('open');document.body.style.overflow='hidden';
-  }
-  function closeDemo(){
-    modal.classList.remove('open');frame.src='about:blank';document.body.style.overflow='';
-  }
-  document.querySelectorAll('[data-demo]').forEach(function(el){
-    el.addEventListener('click',function(){openDemo(el.getAttribute('data-demo'),el.getAttribute('data-title'))});
-  });
-  document.getElementById('demoClose').addEventListener('click',closeDemo);
-  modal.addEventListener('click',function(e){if(e.target===modal)closeDemo()});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&modal.classList.contains('open'))closeDemo()});
-})();
-</script>
+<section class="progress-section section-shell section-space" aria-labelledby="progress-title"><div class="section-heading"><div><p class="eyebrow">04 / BUILT FROM REAL DAYS</p><h2 id="progress-title">운영 현장에서 시작해,<br>더 많은 일상으로.</h2></div><p class="section-description">수영장을 운영하며 만난 실제 질문들.<br>디디다는 그 질문을 하나씩 풀어 가며<br>회원과 센터의 다음을 준비하고 있습니다.</p></div><div class="progress-list"><article><span class="status-label"><i></i> 운영 현장에서</span><h3>매일의 문제부터 풀었습니다.</h3><p>서울 PAB 수영장의 환불·반 변경·양도 계산 도구.<br>반복되는 업무를 정리하는 일에서 출발했습니다.</p></article><article><span class="status-label"><i></i> 지금 살펴보기</span><h3>연결될 경험을 먼저 만나세요.</h3><p>회원과 운영자 화면을 샘플 데이터로 체험할 수 있습니다.<br>새로운 멤버십 경험을 구체적인 화면으로 제안합니다.</p></article><article><span class="status-label upcoming"><i></i> 다음을 준비하며</span><h3>센터의 일상에 맞춰 갑니다.</h3><p>출석, 회원 명부, 만료 관리와 정책 계산 도구까지.<br>첫 외부 센터에 적용할 버전을 준비하고 있습니다.</p></article></div></section>
+<section class="faq-section section-shell" aria-labelledby="faq-title"><div><p class="eyebrow">A FEW THINGS TO KNOW</p><h2 id="faq-title">조금 더 궁금하다면.</h2></div><div class="faq-list"><details><summary>지금 바로 사용할 수 있나요?<span aria-hidden="true">＋</span></summary><p>현재 홈페이지에서 회원·운영자 데모를 살펴볼 수 있으며, 외부 센터 적용 버전을 준비 중입니다. 실제 도입 범위와 일정은 센터의 운영 방식에 맞춰 문의를 통해 안내드립니다.</p></details><details><summary>수영장만을 위한 서비스인가요?<span aria-hidden="true">＋</span></summary><p>수영장 운영 경험에서 출발했지만, 회원의 꾸준한 참여와 성장을 중요하게 생각하는 피트니스 센터를 위한 도구를 지향합니다. 종목과 수업 방식에 따른 적용 가능성을 함께 확인합니다.</p></details><details><summary>출석 태그 장비가 꼭 필요한가요?<span aria-hidden="true">＋</span></summary><p>홈페이지의 태그 버튼은 출석 경험을 보여 주는 체험입니다. 실제 출석 방식과 NFC 리더기 등 장비 연동 여부는 센터의 기존 장비와 운영 환경을 확인한 뒤 협의합니다.</p></details><details><summary>데모에 보이는 기록은 실제 회원 정보인가요?<span aria-hidden="true">＋</span></summary><p>아니요. 홈페이지와 데모의 이름, 출석 횟수, 피드백, 운영 수치는 이해를 돕기 위한 예시입니다. 홈페이지의 체험 버튼은 실제 출석이나 회원 정보를 저장하지 않습니다.</p></details></div></section>
+<section class="contact-section section-shell" id="contact" aria-labelledby="contact-title"><div class="contact-top"><p class="eyebrow">LET’S MAKE THE NEXT CONNECTION</p><span aria-hidden="true">↗</span></div><h2 id="contact-title">우리 센터의 다음 이야기를<br>함께 시작해 볼까요?</h2><div class="contact-bottom"><p>어떤 센터인지, 어떤 고민이 있는지.<br>당신의 일상부터 들려주세요.</p><a class="button button-dark" href="mailto:hello@dididah.kr?subject=%EB%94%94%EB%94%94%EB%8B%A4%20%EB%8F%84%EC%9E%85%20%EB%AC%B8%EC%9D%98">도입 이야기 나누기 <span aria-hidden="true">↗</span></a></div><div class="email-line"><a href="mailto:hello@dididah.kr">hello@dididah.kr</a><button id="copy-email" aria-label="문의 이메일 주소 복사">주소 복사</button><span id="copy-status" role="status"></span></div></section>
+</main>
+<footer class="site-footer section-shell"><a class="brand footer-brand" href="#" aria-label="디디다 홈"><img src="assets/logo-web-black.svg" alt="" width="88" height="41"><span>dididah.</span></a><p>작은 닿음, 이어지는 우리.</p><span>© <span id="year">2026</span> DIDIDAH. SEOUL.</span><a href="#" class="back-top">맨 위로 ↑</a></footer>
+<dialog id="demo-dialog" aria-labelledby="demo-title"><div class="dialog-toolbar"><div><span class="sample-label">DEMO</span><h2 id="demo-title">회원 데모</h2></div><div><a id="demo-full-link" href="demo/member.html" target="_blank" rel="noopener">새 창에서 열기 ↗</a><button id="close-demo" aria-label="데모 닫기">✕</button></div></div><p class="dialog-note">샘플 데이터로 구성된 화면입니다. 실제 계정이나 출석 기록과 연결되지 않습니다.</p><iframe id="demo-frame" title="디디다 회원 데모" loading="lazy"></iframe></dialog>
 </body>
 </html>
